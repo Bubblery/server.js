@@ -1,0 +1,149 @@
+var http = require("http");
+var fs = require('fs');
+
+
+
+var server = http.createServer(function(req, res){
+  
+    if(req.url =="/newuser" && req.method =="POST"){
+       var TheNewUser ="";
+        req.on("data",function(data){
+            TheNewUser = data;
+            console.log(JSON.parse(TheNewUser));
+        });
+ req.on("end", function(){
+     var userParsed = JSON.parse(TheNewUser);
+    console.log('Connecting to MYSQL...');
+var client=require('mysql').createConnection({
+    'host':'localhost',
+    'port':'3306',
+    'user':'root',
+    'password':'13658444998'
+});
+ClientConnectionReady = function(client)
+{
+    client.query('USE fornode', function(error, results) {
+        if(error) {
+            console.log('ClientConnectionReady Error: ' + error.message);
+            client.end();
+            return;
+        }
+        InsertDate(client);
+    });
+};
+InsertDate = function(client){
+    var values=[userParsed.name,userParsed.password,userParsed.language];
+    client.query('INSERT INTO user SET username=?,password=?,language=?',
+        values,
+        function(error,results){
+            if (error) {
+                console.log('ClientReady Error:'+error.message);
+                client.end();
+            return;
+            }
+            console.log('Inserted:'+results.affectedRows+'row.');
+        console.log('Id inserted:'+results.insertId);
+        }
+        );
+}
+ClientConnectionReady(client);
+   });
+    }
+       if(req.url == "/register" && req.method == "GET"){
+        res.writeHead(200,{"Content-Type":"text/html"});
+        res.write(fs.readFileSync("Register.html")); 
+        res.end();
+    }
+    if(req.url == "/loggin" && req.method == "GET"){
+        res.writeHead(200,{"Content-Type":"text/html"});
+        res.write(fs.readFileSync("Loggin.html")); 
+        res.end();
+    }
+    if(req.url =="/oneuser" && req.method =="POST"){
+
+       var TheUser ="";
+        req.on("data",function(data){
+            TheUser = data;
+            console.log(JSON.parse(TheUser));
+        });
+ req.on("end", function(){
+     var userParsed = JSON.parse(TheUser);
+    console.log('Connecting to MYSQL...');
+var client=require('mysql').createConnection({
+    'host':'localhost',
+    'port':'3306',
+    'user':'root',
+    'password':'13658444998'
+});
+ClientConnectionReady = function(client)
+{
+    client.query('USE fornode', function(error, results) {
+        if(error) {
+            console.log('ClientConnectionReady Error: ' + error.message);
+            client.end();
+            return;
+        }
+        GetDate(client);
+    });
+};
+GetDate = function(client)
+{
+    client.query(
+   "SELECT * FROM user where username='" + userParsed.name + "' limit 1",
+    function selectdate(error, results, fields){
+        if (error) {
+            console.log('GetData Error: ' + error.message);
+            client.end();
+            return;
+        }
+        if(results.length>0)
+        {
+          results.forEach(function(key){
+            //Here!How to 301!!!!
+            if(key.password!=userParsed.password)
+            {
+
+            }
+            else
+            {
+                console.log(key.password);
+            }
+    }
+          );
+        }
+});
+    res.end();
+    client.end();
+    console.log('Closed');
+    console.log("s");
+}
+ClientConnectionReady(client);
+   });
+
+    }
+if(req.url == "/file.js" && req.method == "GET"){
+        res.writeHead(200,{"Content-Type":"text/javascript"});
+        res.write(fs.readFileSync("JS/Register.js")); 
+        res.end();
+     }
+if(req.url=="/loginfile.js"&& req.method =="GET"){
+        res.writeHead(200,{"Content-Type":"text/javascript"});
+        res.write(fs.readFileSync("JS/Loggin.js")); 
+        res.end();
+}
+});
+server.listen(8080);
+/*wsServer = new WebSocketServer({
+    httpServer : server,
+});
+wsServer.on('request',function(request){
+
+    var connection = request.accept("echo-protocol", 
+                                    request.origin);
+    connection.on("message", function(message){
+        userdata=message.utf8Data;
+        NewUser=JSON.parse(userdata);
+        console.log(NewUser.name);
+        InsertUser(NewUser);
+    }); 
+});*/
